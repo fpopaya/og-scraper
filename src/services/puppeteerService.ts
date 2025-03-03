@@ -1,9 +1,7 @@
-import { executablePath } from "puppeteer";
-import puppeteer from "puppeteer-core";
+import puppeteer from "puppeteer";
 
 export const scrapeWithPuppeteer = async (url: string) => {
   const browser = await puppeteer.launch({
-    executablePath: executablePath(),
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   const page = await browser.newPage();
