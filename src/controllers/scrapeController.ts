@@ -23,7 +23,9 @@ export const scrapeController = async (req: Request, res: Response) => {
       res.json(result);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "No se pudo obtener la información" });
+      res
+        .status(500)
+        .json({ error: `No se pudo obtener la información, ${error}` });
     }
   } finally {
     console.log("Scrape finalizado");
