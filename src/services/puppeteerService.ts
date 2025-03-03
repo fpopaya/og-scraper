@@ -5,8 +5,7 @@ export const scrapeWithPuppeteer = async (url: string) => {
   const browser = await puppeteer.launch({
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
-    executablePath:
-      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    executablePath: await chromium.executablePath(),
   });
   const page = await browser.newPage();
 
