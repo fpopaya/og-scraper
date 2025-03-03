@@ -1,4 +1,4 @@
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
 
 export const scrapeWithPuppeteer = async (url: string) => {
   const browser = await puppeteer.launch({
