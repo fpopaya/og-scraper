@@ -1,8 +1,15 @@
+import chromium from "@sparticuz/chromium";
 import puppeteer from "puppeteer-core";
 
 export const scrapeWithPuppeteer = async (url: string) => {
   const browser = await puppeteer.launch({
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath:
+      process.env.CHROME_EXECUTABLE_PATH ||
+      (await chromium.executablePath(
+        "/var/task/node_modules/@sparticuz/chromium/bin"
+      )),
   });
   const page = await browser.newPage();
 
