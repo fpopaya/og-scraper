@@ -7,7 +7,8 @@
     "build": "tsc",
     "serve": "node dist/index.js",
     "build:netlify": "tsc && cp -R src netlify/functions",
-    "postinstall": "puppeteer install"
+    "postinstall": "puppeteer install",
+    "install-dependencies": "apt-get install -y libnss3"
   },
   "dependencies": {
     "@sparticuz/chromium": "^109.0.5",
