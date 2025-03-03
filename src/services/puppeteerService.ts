@@ -6,10 +6,7 @@ export const scrapeWithPuppeteer = async (url: string) => {
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
     executablePath:
-      process.env.CHROME_EXECUTABLE_PATH ||
-      (await chromium.executablePath(
-        "/var/task/node_modules/@sparticuz/chromium/bin"
-      )),
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   });
   const page = await browser.newPage();
 
