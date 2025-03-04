@@ -1,15 +1,27 @@
-import dotenv from "dotenv";
-import express from "express";
-import serverless from "serverless-http";
-import { scrapeController } from "../../src/controllers/scrapeController";
+// src/netlify/functions/server.ts
+import { APIGatewayProxyHandler } from 'aws-lambda';
+import { scrapeWithPuppeteer } from '../../src/services/puppeteerService';
 
-dotenv.config();
+export const handler: APIGatewayProxyHandler = async (event) => {
+  try {
+    const { url } = JSON.parse(event.body || '{}');
 
-const app = express();
-const router = express.Router();
+    if (!url) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "No se proporcionó la URL" }),
+      };
+    }
 
-router.get("/scrape", scrapeController);
-
-app.use("/.netlify/functions/server", router);
-
-module.exports.handler = serverless(app);
+    const data = await scrapeWithPuppeteer(url);
+    return {
+      statusCode: 200,
+      body: JSON.stringify(data),
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message }),
+    };
+  }
+};

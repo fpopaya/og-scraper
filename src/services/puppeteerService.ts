@@ -1,12 +1,29 @@
-import chromium from "@sparticuz/chromium";
-import puppeteer from "puppeteer-core";
-
 export const scrapeWithPuppeteer = async (url: string) => {
-  const browser = await puppeteer.launch({
-    args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath(),
+  let puppeteerLib: any;
+  let executablePath: string | undefined;
+  let args: string[];
+  let defaultViewport: any;
+
+  if (process.env.NODE_ENV === 'production') {
+    puppeteerLib = require('puppeteer-core');
+    const chromium = require('@sparticuz/chromium');
+    executablePath = await chromium.executablePath();
+    args = chromium.args;
+    defaultViewport = chromium.defaultViewport;
+  } else {
+    puppeteerLib = require('puppeteer');
+    executablePath = undefined;
+    args = ['--no-sandbox', '--disable-setuid-sandbox'];
+    defaultViewport = null;
+  }
+
+  const browser = await puppeteerLib.launch({
+    args,
+    executablePath,
+    defaultViewport,
+    headless: true,
   });
+
   const page = await browser.newPage();
 
   await page.setUserAgent(
@@ -14,34 +31,39 @@ export const scrapeWithPuppeteer = async (url: string) => {
   );
 
   await page.setRequestInterception(true);
-  page.on("request", (request) => {
+  page.on("request", (request: { resourceType: () => any; abort: () => void; continue: () => void; }) => {
     const resourceType = request.resourceType();
-    if (
-      resourceType === "image" ||
-      resourceType === "stylesheet" ||
-      resourceType === "font"
-    ) {
+    if (["image", "stylesheet", "font"].includes(resourceType)) {
       request.abort();
     } else {
       request.continue();
     }
   });
 
-  const response = await page.goto(url, {
+  await page.goto(url, {
     waitUntil: "domcontentloaded",
     timeout: 30000,
   });
 
-  const ogImage = await page
-    .$eval('meta[property="og:image"]', (el) => el?.content || "")
-    .catch(() => "");
-  const ogTitle = await page
-    .$eval('meta[property="og:title"]', (el) => el?.content || "")
-    .catch(() => "");
-  const ogSiteName = await page
-    .$eval('meta[property="og:site_name"]', (el) => el?.content || "")
-    .catch(() => "");
+  const ogImageElement = await page.$('meta[property="og:image"]');
+  const ogTitleElement = await page.$('meta[property="og:title"]');
+  const ogDescriptionElement = await page.$('meta[property="og:description"]');
+
+  const ogImage = ogImageElement
+    ? await ogImageElement.evaluate((el: { getAttribute: (arg0: string) => any; }) => el.getAttribute("content"))
+    : null;
+  const ogTitle = ogTitleElement
+    ? await ogTitleElement.evaluate((el: { getAttribute: (arg0: string) => any; }) => el.getAttribute("content"))
+    : null;
+  const ogDescription = ogDescriptionElement
+    ? await ogDescriptionElement.evaluate((el: { getAttribute: (arg0: string) => any; }) => el.getAttribute("content"))
+    : null;
 
   await browser.close();
-  return { ogImage, ogTitle, ogSiteName };
+
+  return {
+    title: ogTitle,
+    image: ogImage,
+    description: ogDescription,
+  };
 };

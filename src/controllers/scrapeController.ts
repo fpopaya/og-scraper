@@ -13,14 +13,24 @@ export const scrapeController = async (req: Request, res: Response) => {
 
   try {
     const result = await getOgData(url);
-    cache[url] = result;
-    res.json(result);
+    const transformedResult = {
+      ogTitle: result.ogTitle,
+      ogImage: result.ogImage,
+      ogSiteName: result.ogSiteName,
+    };
+    cache[url] = transformedResult;
+    res.json(transformedResult);
   } catch (error) {
     console.error(error);
     try {
       const result = await scrapeWithPuppeteer(url);
-      cache[url] = result;
-      res.json(result);
+      const transformedResult = {
+        ogTitle: result.title,
+        ogImage: result.image,
+        ogSiteName: result.description,
+      };
+      cache[url] = transformedResult;
+      res.json(transformedResult);
     } catch (error) {
       console.error(error);
       res
