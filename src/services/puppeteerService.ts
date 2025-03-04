@@ -5,15 +5,14 @@ export const scrapeWithPuppeteer = async (url: string) => {
   let defaultViewport: any;
 
   if (process.env.NODE_ENV === 'production') {
-    // En producción se utiliza puppeteer-core junto con @sparticuz/chromium
+    // En producción, usa puppeteer-core junto con chrome-aws-lambda
     puppeteerLib = require('puppeteer-core');
-    const chromium = require('@sparticuz/chromium');
-    executablePath = await chromium.executablePath();
-    // Agregamos un flag extra (opcional) para evitar problemas de memoria compartida
-    args = [...chromium.args, '--disable-dev-shm-usage'];
-    defaultViewport = chromium.defaultViewport;
+    const chromeLambda = require('chrome-aws-lambda');
+    executablePath = await chromeLambda.executablePath;
+    args = chromeLambda.args;
+    defaultViewport = chromeLambda.defaultViewport;
   } else {
-    // En desarrollo se utiliza la versión completa de puppeteer (incluye Chromium)
+    // En desarrollo, usa la versión completa de puppeteer (incluye Chromium)
     puppeteerLib = require('puppeteer');
     executablePath = undefined;
     args = ['--no-sandbox', '--disable-setuid-sandbox'];
@@ -33,7 +32,6 @@ export const scrapeWithPuppeteer = async (url: string) => {
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
   );
 
-  // Interceptamos las requests para abortar recursos innecesarios y optimizar la carga
   await page.setRequestInterception(true);
   page.on("request", (request: { resourceType: () => any; abort: () => void; continue: () => void; }) => {
     const resourceType = request.resourceType();
@@ -49,7 +47,6 @@ export const scrapeWithPuppeteer = async (url: string) => {
     timeout: 30000,
   });
 
-  // Extraemos los meta tags de Open Graph
   const ogImageElement = await page.$('meta[property="og:image"]');
   const ogTitleElement = await page.$('meta[property="og:title"]');
   const ogDescriptionElement = await page.$('meta[property="og:description"]');
