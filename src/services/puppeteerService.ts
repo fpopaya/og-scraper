@@ -5,19 +5,21 @@ export const scrapeWithPuppeteer = async (url: string) => {
   let defaultViewport: any;
 
   if (process.env.NODE_ENV === 'production') {
-    // En producción, usamos puppeteer-core junto con @sparticuz/chromium
     puppeteerLib = require('puppeteer-core');
     const chromium = require('@sparticuz/chromium');
     executablePath = await chromium.executablePath();
+    if (!executablePath) {
+      throw new Error("No se encontró el ejecutable de Chromium. Verifica que @sparticuz/chromium esté instalado correctamente.");
+    }
     args = [...chromium.args, '--disable-dev-shm-usage'];
     defaultViewport = chromium.defaultViewport;
   } else {
-    // En desarrollo, usamos la versión completa de puppeteer (incluye Chromium)
     puppeteerLib = require('puppeteer');
     executablePath = undefined;
     args = ['--no-sandbox', '--disable-setuid-sandbox'];
     defaultViewport = null;
   }
+  
 
   const browser = await puppeteerLib.launch({
     args,
