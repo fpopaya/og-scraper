@@ -5,5 +5,9 @@
   functions = "netlify/functions"
   publish = "dist"
 
+[build.environment]
+  NODE_ENV = "production"
+  NPM_CONFIG_PRODUCTION = "false"
+
 [functions]
   node_bundler = "esbuild"
