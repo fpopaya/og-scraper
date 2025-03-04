@@ -7,14 +7,10 @@ export const scrapeWithPuppeteer = async (url: string) => {
   if (process.env.NODE_ENV === 'production') {
     puppeteerLib = require('puppeteer-core');
     const chromium = require('@sparticuz/chromium');
-    
-    // Usa la variable de entorno si está definida, de lo contrario usa chromium.executablePath()
-    executablePath = process.env.CHROMIUM_EXECUTABLE_PATH || await chromium.executablePath();
-    
+    executablePath = await chromium.executablePath();
     if (!executablePath) {
-      throw new Error(`No se encontró un ejecutable válido de Chromium. Valor obtenido: ${executablePath}`);
+      throw new Error("No se encontró el ejecutable de Chromium. Verifica que @sparticuz/chromium esté instalado correctamente.");
     }
-    
     args = [...chromium.args, '--disable-dev-shm-usage'];
     defaultViewport = chromium.defaultViewport;
   } else {
@@ -23,6 +19,8 @@ export const scrapeWithPuppeteer = async (url: string) => {
     args = ['--no-sandbox', '--disable-setuid-sandbox'];
     defaultViewport = null;
   }
+  
+
   const browser = await puppeteerLib.launch({
     args,
     executablePath,
@@ -51,6 +49,10 @@ export const scrapeWithPuppeteer = async (url: string) => {
     timeout: 30000,
   });
 
+  // Esperar un poco si es necesario (opcional)
+  // await page.waitForTimeout(1000);
+
+  // Extraer los meta tags de forma segura
   const ogImageElement = await page.$('meta[property="og:image"]');
   const ogTitleElement = await page.$('meta[property="og:title"]');
   const ogDescriptionElement = await page.$('meta[property="og:description"]');
