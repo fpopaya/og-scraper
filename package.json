@@ -11,10 +11,12 @@
     "@sparticuz/chromium": "^109.0.5",
     "axios": "^1.4.0",
     "cheerio": "^1.0.0-rc.12",
+    "chrome-aws-lambda": "^10.1.0",
     "dotenv": "^16.4.7",
     "express": "^4.18.2",
     "install": "^0.13.0",
     "npm": "^11.1.0",
+    "or": "^0.2.0",
     "puppeteer-core": "^24.3.0",
     "serverless-http": "^2.7.0"
   },
