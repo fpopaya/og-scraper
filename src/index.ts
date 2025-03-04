@@ -1,14 +1,19 @@
-import express from "express";
-import { scrapeController } from "./controllers/scrapeController";
 import dotenv from "dotenv";
+import express from "express";
+import serverless from "serverless-http";
+import { scrapeController } from "./controllers/scrapeController";
+
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+// Agrega el middleware para parsear JSON si es necesario:
+app.use(express.json());
 
-app.get("/scrape", scrapeController);
+const router = express.Router();
+router.get("/scrape", scrapeController);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Se expone la ruta con el prefijo de Netlify Functions:
+app.use("/.netlify/functions/server", router);
+
+module.exports.handler = serverless(app);
