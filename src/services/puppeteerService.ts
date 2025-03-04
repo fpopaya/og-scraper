@@ -7,10 +7,14 @@ export const scrapeWithPuppeteer = async (url: string) => {
   if (process.env.NODE_ENV === 'production') {
     puppeteerLib = require('puppeteer-core');
     const chromium = require('@sparticuz/chromium');
-    executablePath = await chromium.executablePath();
+    
+    // Usa la variable de entorno si está definida, de lo contrario usa chromium.executablePath()
+    executablePath = process.env.CHROMIUM_EXECUTABLE_PATH || await chromium.executablePath();
+    
     if (!executablePath) {
-      throw new Error("No se encontró el ejecutable de Chromium.");
+      throw new Error(`No se encontró un ejecutable válido de Chromium. Valor obtenido: ${executablePath}`);
     }
+    
     args = [...chromium.args, '--disable-dev-shm-usage'];
     defaultViewport = chromium.defaultViewport;
   } else {
@@ -19,7 +23,6 @@ export const scrapeWithPuppeteer = async (url: string) => {
     args = ['--no-sandbox', '--disable-setuid-sandbox'];
     defaultViewport = null;
   }
-
   const browser = await puppeteerLib.launch({
     args,
     executablePath,
