@@ -8,6 +8,7 @@
 [build.environment]
   NODE_ENV = "production"
   NPM_CONFIG_PRODUCTION = "false"
+  CHROMIUM_EXECUTABLE_PATH = "/usr/bin/chromium-browser"
 
 [functions]
   node_bundler = "esbuild"
