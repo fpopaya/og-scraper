@@ -1,5 +1,6 @@
 [build]
- command = "npm install --legacy-peer-deps && npm run build"
+  NODE_ENV = "production"
+  command = "npm install --legacy-peer-deps && npm run build"
   functions = "netlify/functions"
   publish = "dist"
 
