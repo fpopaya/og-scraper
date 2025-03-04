@@ -1,7 +1,7 @@
-import dotenv from "dotenv";
 import express from "express";
 import serverless from "serverless-http";
 import { scrapeController } from "./controllers/scrapeController";
+import dotenv from "dotenv";
 
 
 dotenv.config();
